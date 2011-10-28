@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>PiePie charting</title>
+        <script src="https://raw.github.com/DmitryBaranovskiy/raphael/master/raphael.js"></script>
+		<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+        <script src="piepie.js"></script>
+        <script>
+        $(window).load(function(){
+			new PiePie({
+				x: 10,
+				y: 10,
+				width: 350,
+				height: 300,
+				colors: ["#265434", "#3F99D2", "#ED23CD", "#B6EBD9", "#68AB79"],
+				dataUrl: "piepie.json",
+				label: "Transferable",
+				orientation: PiePie.HORIZONTAL
+			});
+		});
+        </script>
+	</head>
+	<body>
+		
+	</body>
+</html>
