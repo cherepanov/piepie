@@ -134,7 +134,7 @@ var PiePie = function(config) {
 		});
 	}
 
-	$.getJSON("piepie.json", function(res){
+	$.getJSON(config.dataURL, function(res){
 		var pieOffset = 0;
 		var animationQueue = $({});
 		data = res.data;
@@ -148,6 +148,9 @@ var PiePie = function(config) {
 				pieOffset += percent;
 			});
 		});
+		if(config.endLoad) {
+			config.endLoad();
+		}
 	});
 	
 	if(DEBUG) {
@@ -158,4 +161,5 @@ var PiePie = function(config) {
 	 	paper.circle(pieCenterX, pieCenterY - pieOuterRadius, 3).attr({fill: "#E00", stroke: "none"});
 	}
 	
+	return paper;
 };
