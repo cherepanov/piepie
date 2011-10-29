@@ -10,6 +10,26 @@ Math.sinA = function(angle) {
 	return Math.sin(angle * Math.RAD);
 };
 
+/**
+ * Creates PiePie chart instance.
+ *
+ * @author Alexey Cherepanov<a@cherepanov.info>
+ * 
+ * @this {PiePie}
+ * @constructor
+ * @return {PiePie} Raphael paper object
+ * 
+ * @param {json} config configuration object
+ * 	@param {Integer}	config.x			x-coordinate location
+ * 	@param {Integer} 	config.y 			y-coordinate location
+ * 	@param {Integer}	config.width 		chart canvas width
+ * 	@param {Integer}	config.height 		chart canvas height
+ * 	@param {json} 		config.background 	background fill attributes
+ * 	@param {Array} 		config.colors 		array of sector colors in hex format
+ * 	@param {String} 	config.dataURL 		location of service
+ * 	@param {Integer} 	config.rotation	 	pie rotation angle in degrees
+ */
+
 var PiePie = function(config) {
 	
 	PiePie.VERTICAL = 1;
@@ -18,17 +38,17 @@ var PiePie = function(config) {
 	//TODO: validate config and data with schema
 
 	var 	pieCenterX 		= config.width / 2
-		,	pieCenterY 		= config.height / 2
-		,	pieInnerRadius	= config.width / 7
-		,	pieOuterRadius	= config.width / 4
-		,	pieSpotRadius	= (pieOuterRadius + pieInnerRadius) / 2
+		,	pieCenterY 		= config.height * 0.6
+		,	pieInnerRadius	= config.width * 0.2
+		,	pieOuterRadius	= config.width * 0.35
+		,	pieSpotRadius	= (pieOuterRadius + pieInnerRadius) * 0.53
 		,	data = {}
 		, 	label = ""
 		;
 	
 	var paper = Raphael(config.x, config.y, config.width, config.height);
 	
-	paper.rect(0, 0, config["width"], config["height"]).attr({fill: config.background, stroke: "none"});
+	paper.rect(0, 0, config.width, config.height).attr({fill: config.background, stroke: "none"});
 
 	paper.customAttributes.arc = function (startAngle, endAngle, innerRadius, outerRadius) {
 		var
@@ -59,8 +79,8 @@ var PiePie = function(config) {
 		,   tipAngle = (startAngle + endAngle) / 2
 		,   tipCenterX = pieCenterX - pieSpotRadius * Math.cosA(tipAngle)
 		,   tipCenterY = pieCenterY - pieSpotRadius * Math.sinA(tipAngle)
-		,   tipEndX = pieCenterX - 1.2 * pieOuterRadius * Math.cosA(tipAngle)
-		,   tipEndY = pieCenterY - 1.2 * pieOuterRadius * Math.sinA(tipAngle)
+		,   tipEndX = pieCenterX - 1.1 * pieOuterRadius * Math.cosA(tipAngle)
+		,   tipEndY = pieCenterY - 1.1 * pieOuterRadius * Math.sinA(tipAngle)
 		,	tipLineEndX = (tipAngle < 90 ? tipEndX - 30: tipEndX + 30)
 		;
 		
@@ -71,9 +91,9 @@ var PiePie = function(config) {
 		}
 
 		var baseColor = Raphael.rgb2hsb(color)
-		,	spotColor = $.extend(baseColor);
+		,	spotColor = $.extend(baseColor)
 		;
-		spotColor.b *= 0.75;
+		spotColor.b *= 0.9;
 		
 		var set = paper.set();
 
@@ -84,7 +104,7 @@ var PiePie = function(config) {
 	            "L", tipEndX, tipEndY,
 	            "L", tipLineEndX, tipEndY
 	        ]));
-			set.push(paper.text(tipLineEndX, tipEndY - 10, percent));
+			set.push(paper.text(tipLineEndX + (tipAngle < 90 ? 12 : -12), tipEndY - 10, percent * 100 + "%"));
 		}
 
 		var outerArc = paper.path()
@@ -124,17 +144,23 @@ var PiePie = function(config) {
 
 	function drawLegend(){
 		var x = pieCenterX - pieOuterRadius
-		,	y = pieCenterY * 1.2
+		,	y = pieCenterY + 20
 		;
-		paper.text(x, y, label.toUpperCase()).attr({font: "16px Arial", fill: "#000", "text-anchor": "start"});
+		paper.text(x, y, label.toUpperCase()).attr({font: "16px Arial", "font-weight": "bold", fill: "#000", "text-anchor": "start"});
 		$(data).each(function(idx, obj){
 			y += 20;
-			paper.rect(x, y, 20, 10).attr({fill: config.colors[idx], stroke: "none"});
+			var c = Raphael.rgb2hsb(config.colors[idx]);
+			c.b *= 0.5;
+			c = Raphael.hsb2rgb(c);
+			var f = "315-" + c + "-" + config.colors[idx];
+			paper.rect(x, y, 20, 10).attr({fill: f, stroke: "none"});
 			paper.text(x + 50, y + 4, obj.title.toUpperCase());
 		});
 	}
 
-	$.getJSON(config.dataURL, function(res){
+	$.getJSON(config.dataURL, function(res) {
+		//TODO: implement colors generator
+		//TODO: throw exception on error
 		var pieOffset = 0;
 		var animationQueue = $({});
 		data = res.data;

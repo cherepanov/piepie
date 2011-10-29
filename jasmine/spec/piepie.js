@@ -7,7 +7,7 @@ describe("PiePie", function() {
 				y: 100,
 				width: 350,
 				height: 300,
-				background: "#eee",
+				background: {fill: "#eee", stroke: "none"},
 				colors: ["#265434", "#3F99D2", "#ED23CD", "#B6EBD9", "#68AB79"],
 				dataURL: "http://localhost/piepie.json",
 				endLoad: function(){
