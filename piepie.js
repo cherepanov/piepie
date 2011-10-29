@@ -30,10 +30,25 @@ var PiePie = function(config) {
 	
 	paper.rect(0, 0, config["width"], config["height"]).attr({fill: config.background, stroke: "none"});
 
-	paper.customAttributes.arc = function (startX, startY, endX, endY, radius) {
+	paper.customAttributes.arc = function (startAngle, endAngle, innerRadius, outerRadius) {
+		var
+			outerStartX	= pieCenterX - outerRadius * Math.cosA(startAngle)
+		,	outerStartY = pieCenterY - outerRadius * Math.sinA(startAngle)
+		,	outerEndX 	= pieCenterX - outerRadius * Math.cosA(endAngle)
+		,	outerEndY 	= pieCenterY - outerRadius * Math.sinA(endAngle)
+		,	innerStartX	= pieCenterX - innerRadius * Math.cosA(startAngle)
+		,	innerStartY	= pieCenterY - innerRadius * Math.sinA(startAngle)
+		,	innerEndX 	= pieCenterX - innerRadius * Math.cosA(endAngle)
+		,	innerEndY 	= pieCenterY - innerRadius * Math.sinA(endAngle)
+		;
+
         var p = [
-          "M", startX, startY,
-          "A", radius, radius, 0, 0, 1, endX, endY
+          "M", outerStartX, outerStartY,
+          "A", outerRadius, outerRadius, 0, 0, 1, outerEndX, outerEndY,
+          "L", innerEndX, innerEndY,
+          "A", innerRadius, innerRadius, 0, 0, 0, innerStartX, innerStartY,
+          "L", outerStartX, outerStartY,
+          "Z"
         ];
 		return {path: p};
 	};
@@ -47,16 +62,6 @@ var PiePie = function(config) {
 		,   tipEndX = pieCenterX - 1.2 * pieOuterRadius * Math.cosA(tipAngle)
 		,   tipEndY = pieCenterY - 1.2 * pieOuterRadius * Math.sinA(tipAngle)
 		,	tipLineEndX = (tipAngle < 90 ? tipEndX - 30: tipEndX + 30)
-		,	pieOuterStrokeWidth = pieOuterRadius - pieSpotRadius
-		,	pieInnerStrokeWidth = pieSpotRadius - pieInnerRadius
-		,	arcStartX	= pieCenterX - (pieOuterRadius - pieOuterStrokeWidth / 2) * Math.cosA(startAngle)
-		,	arcStartY 	= pieCenterY - (pieOuterRadius - pieOuterStrokeWidth / 2) * Math.sinA(startAngle)
-		,	arcEndX 	= pieCenterX - (pieOuterRadius - pieOuterStrokeWidth / 2) * Math.cosA(endAngle)
-		,	arcEndY 	= pieCenterY - (pieOuterRadius - pieOuterStrokeWidth / 2) * Math.sinA(endAngle)
-		,	arcInnerStartX	= pieCenterX - (pieInnerRadius + pieInnerStrokeWidth / 2) * Math.cosA(startAngle)
-		,	arcInnerStartY 	= pieCenterY - (pieInnerRadius + pieInnerStrokeWidth / 2) * Math.sinA(startAngle)
-		,	arcInnerEndX 	= pieCenterX - (pieInnerRadius + pieInnerStrokeWidth / 2) * Math.cosA(endAngle)
-		,	arcInnerEndY 	= pieCenterY - (pieInnerRadius + pieInnerStrokeWidth / 2) * Math.sinA(endAngle)
 		;
 		
 		if(DEBUG) {
@@ -82,21 +87,39 @@ var PiePie = function(config) {
 			set.push(paper.text(tipLineEndX, tipEndY - 10, percent));
 		}
 
-		paper.path()
-			.attr({arc: [arcStartX, arcStartY, arcStartX, arcStartY, pieOuterRadius]})
-			.attr({stroke: baseColor, "stroke-width": pieOuterStrokeWidth})
-			.animate(
-					{arc: [arcStartX, arcStartY, arcEndX, arcEndY, pieOuterRadius]}
-					, 1000, ">", function(){
-						onAnimationEnd();
-						drawTip();
-						set.push(this);
-						set.mouseover(function() {
-							set.stop().animate({transform: "s1.1 1.1 " + pieCenterX + " " + pieCenterY}, 500, "elastic");
-						}).mouseout(function () {
-				            set.stop().animate({transform: ""}, 500, "elastic");
-				        });
-					});		
+		var outerArc = paper.path()
+							.attr({arc: [startAngle, startAngle, pieSpotRadius, pieOuterRadius]})
+							.attr({fill: baseColor, stroke: "none"});
+
+		var innerArc = paper.path()
+							.attr({arc: [startAngle, startAngle, pieInnerRadius, pieSpotRadius]})
+							.attr({fill: spotColor, stroke: "none"});
+		
+		var outerAnimation = Raphael.animation(
+			{arc: [startAngle, endAngle, pieSpotRadius, pieOuterRadius]}, 1000, ">"
+			, function(){
+				onAnimationEnd();
+				drawTip();
+				set.push(this);
+				this.mouseover(function() {
+					set.stop().animate({transform: "s1.1 1.1 " + pieCenterX + " " + pieCenterY}, 500, "elastic");
+				}).mouseout(function () {
+		            set.stop().animate({transform: ""}, 500, "elastic");
+		        });
+		});
+		
+		outerArc.animate(outerAnimation);
+		
+		innerArc.animateWith(outerArc, outerAnimation,
+			{arc: [startAngle, endAngle, pieInnerRadius, pieSpotRadius]}, 1000, ">"
+			, function(){
+				set.push(this);
+				this.mouseover(function() {
+					set.stop().animate({transform: "s1.1 1.1 " + pieCenterX + " " + pieCenterY}, 500, "elastic");
+				}).mouseout(function () {
+		            set.stop().animate({transform: ""}, 500, "elastic");
+		        });
+		});
 	}
 
 	function drawLegend(){
@@ -109,7 +132,6 @@ var PiePie = function(config) {
 			paper.rect(x, y, 20, 10).attr({fill: config.colors[idx], stroke: "none"});
 			paper.text(x + 50, y + 4, obj.title.toUpperCase());
 		});
-		console.log(x);
 	}
 
 	$.getJSON("piepie.json", function(res){
@@ -124,7 +146,6 @@ var PiePie = function(config) {
 				var percent = parseFloat(obj.value);
 				drawSector(pieOffset, percent, config.colors[idx], next);
 				pieOffset += percent;
-				console.debug(pieOffset);	
 			});
 		});
 	});
