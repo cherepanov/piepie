@@ -23,11 +23,12 @@ var PiePie = function(config) {
 		,	pieOuterRadius	= config.width / 4
 		,	pieSpotRadius	= (pieOuterRadius + pieInnerRadius) / 2
 		,	data = {}
+		, 	label = ""
 		;
 	
 	var paper = Raphael(config.x, config.y, config.width, config.height);
 	
-	paper.rect(0, 0, config["width"], config["height"]).attr({fill: "#eee", stroke: "none"});
+	paper.rect(0, 0, config["width"], config["height"]).attr({fill: config.background, stroke: "none"});
 
 	paper.customAttributes.arc = function (startX, startY, endX, endY, radius) {
         var p = [
@@ -72,7 +73,6 @@ var PiePie = function(config) {
 		var set = paper.set();
 
 		function drawTip(){
-			//tip
 			set.push(paper.circle(tipCenterX, tipCenterY, 3).attr({fill: "#000", stroke: "none"}));
 			set.push(paper.path([
 	            "M", tipCenterX, tipCenterY,
@@ -82,28 +82,28 @@ var PiePie = function(config) {
 			set.push(paper.text(tipLineEndX, tipEndY - 10, percent));
 		}
 
-		var p = paper.path()
-				.attr({arc: [arcStartX, arcStartY, arcStartX, arcStartY, pieOuterRadius]})
-				.attr({stroke: baseColor, "stroke-width": pieOuterStrokeWidth})
-				.animate(
-						{arc: [arcStartX, arcStartY, arcEndX, arcEndY, pieOuterRadius]}
-							, 1000, ">", function(){
-								onAnimationEnd();
-								drawTip();
-								set.push(p);
-								set.mouseover(function() {
-									set.stop().animate({transform: "s1.1 1.1 " + pieCenterX + " " + pieCenterY}, 500, "elastic");
-								}).mouseout(function () {
-						            set.stop().animate({transform: ""}, 500, "elastic");
-						        });
-							});		
+		paper.path()
+			.attr({arc: [arcStartX, arcStartY, arcStartX, arcStartY, pieOuterRadius]})
+			.attr({stroke: baseColor, "stroke-width": pieOuterStrokeWidth})
+			.animate(
+					{arc: [arcStartX, arcStartY, arcEndX, arcEndY, pieOuterRadius]}
+					, 1000, ">", function(){
+						onAnimationEnd();
+						drawTip();
+						set.push(this);
+						set.mouseover(function() {
+							set.stop().animate({transform: "s1.1 1.1 " + pieCenterX + " " + pieCenterY}, 500, "elastic");
+						}).mouseout(function () {
+				            set.stop().animate({transform: ""}, 500, "elastic");
+				        });
+					});		
 	}
 
 	function drawLegend(){
 		var x = pieCenterX - pieOuterRadius
 		,	y = pieCenterY * 1.2
 		;
-		paper.text(x, y, config.label.toUpperCase()).attr({font: "16px Arial", fill: "#000", "text-anchor": "start"});
+		paper.text(x, y, label.toUpperCase()).attr({font: "16px Arial", fill: "#000", "text-anchor": "start"});
 		$(data).each(function(idx, obj){
 			y += 20;
 			paper.rect(x, y, 20, 10).attr({fill: config.colors[idx], stroke: "none"});
@@ -112,10 +112,12 @@ var PiePie = function(config) {
 		console.log(x);
 	}
 
-	var jqxhr = $.getJSON("piepie.json", function(res){
+	$.getJSON("piepie.json", function(res){
 		var pieOffset = 0;
 		var animationQueue = $({});
 		data = res.data;
+		label = res.label;
+		drawLegend();
 		$(data).each(function(idx, obj){
 			//TODO: implement values normalization and sorting
 			animationQueue.queue(function(next) {
@@ -125,7 +127,6 @@ var PiePie = function(config) {
 				console.debug(pieOffset);	
 			});
 		});
-		drawLegend();
 	});
 	
 	if(DEBUG) {
