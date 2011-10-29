@@ -9,7 +9,7 @@ describe("PiePie", function() {
 				height: 300,
 				background: {fill: "#eee", stroke: "none"},
 				colors: ["#265434", "#3F99D2", "#ED23CD", "#B6EBD9", "#68AB79"],
-				dataURL: "http://localhost/piepie.json",
+				dataURL: "http://localhost/testdata/piepie.json",
 				endLoad: function(){
 					//piepie.setViewBox(1,1,1,1,1);
 				}

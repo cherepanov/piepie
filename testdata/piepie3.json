@@ -1,0 +1,21 @@
+{
+	"label": "Transferable 3",
+	"data": [
+				{
+						"title": "foo bar"
+					,	"value": "0.30"
+				},
+				{
+						"title": "foo bar"
+					,	"value": "0.30"
+				},
+				{
+						"title": "foo bar"
+					,	"value": "0.20"
+				},
+				{
+						"title": "abc edf"
+					,	"value": "0.20"
+				}
+	]
+}

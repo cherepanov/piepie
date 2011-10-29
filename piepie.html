@@ -5,18 +5,48 @@
         <title>PiePie charting</title>
         <script src="https://raw.github.com/DmitryBaranovskiy/raphael/master/raphael.js"></script>
 		<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-        <script src="piepie.js"></script>
+        <script src="lib/piepie.js"></script>
         <script>
         $(window).load(function(){
-			new PiePie({
-				x: 10,
-				y: 10,
+			PiePie({
+				x: 0,
+				y: 0,
 				width: 350,
 				height: 300,
 				background: {fill: "#eee", stroke: "none"},
 				colors: ["#265434", "#3F99D2", "#ED23CD", "#B6EBD9", "#68AB79"],
-				dataURL: "piepie.json",
-				rotation: 30
+				dataURL: "testdata/piepie.json",
+				rotation: 0
+			});
+			PiePie({
+				x: 360,
+				y: 0,
+				width: 350,
+				height: 300,
+				background: {fill: "#eee", stroke: "none"},
+				colors: ["#358434", "#3259D2", "#0D23CD", "#E6EB19", "#18ABF9"],
+				dataURL: "testdata/piepie1.json",
+				rotation: 90
+			});
+			PiePie({
+				x: 360,
+				y: 310,
+				width: 350,
+				height: 300,
+				background: {fill: "#eee", stroke: "none"},
+				colors: ["#912434", "#3F9222", "#1223CD", "#BCEB09", "#31A379"],
+				dataURL: "testdata/piepie2.json",
+				rotation: 180
+			});
+			PiePie({
+				x: 0,
+				y: 310,
+				width: 350,
+				height: 300,
+				background: {fill: "#eee", stroke: "none"},
+				colors: ["#245412", "#5634D2", "#ED35CD", "#41EBD9", "#68AB22"],
+				dataURL: "testdata/piepie3.json",
+				rotation: 270
 			});
 		});
         </script>
