@@ -82,19 +82,15 @@ var constr = function(config) {
 		});
 	});
 
-	//#ifdef DEBUG
 	paper.circle(pieCenterX, pieCenterY, 3).attr({fill: "#E00", stroke: "none"});
  	paper.circle(pieCenterX - pieOuterRadius, pieCenterY, 3).attr({fill: "#E00", stroke: "none"});
  	paper.circle(pieCenterX	+ pieOuterRadius, pieCenterY, 3).attr({fill: "#E00", stroke: "none"});
  	paper.circle(pieCenterX, pieCenterY + pieOuterRadius, 3).attr({fill: "#E00", stroke: "none"});
  	paper.circle(pieCenterX, pieCenterY - pieOuterRadius, 3).attr({fill: "#E00", stroke: "none"});
- 	//#end
 
- 	//#ifdef DEBUG
  	constr.prototype.getPrivateProperty = function (name) {
  		return eval(name);
  	};
- 	//#end
 
 	function drawSector(offset, percent, color, onAnimationEnd) {
 		var startAngle = 180 * offset + rotation

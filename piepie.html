@@ -5,10 +5,11 @@
         <title>PiePie charting</title>
         <script src="https://raw.github.com/DmitryBaranovskiy/raphael/master/raphael.js"></script>
 		<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-        <script src="lib/piepie.js"></script>
+        <script src="build/util.js"></script>
+        <script src="build/piepie.js"></script>
         <script>
         $(window).load(function(){
-			PiePie({
+			new PiePie({
 				x: 0,
 				y: 0,
 				width: 350,
@@ -18,7 +19,7 @@
 				dataURL: "testdata/piepie.json",
 				rotation: 0
 			});
-			PiePie({
+			new PiePie({
 				x: 360,
 				y: 0,
 				width: 350,
@@ -28,7 +29,7 @@
 				dataURL: "testdata/piepie1.json",
 				rotation: 90
 			});
-			PiePie({
+			new PiePie({
 				x: 360,
 				y: 310,
 				width: 350,
@@ -38,7 +39,7 @@
 				dataURL: "testdata/piepie2.json",
 				rotation: 180
 			});
-			PiePie({
+			new PiePie({
 				x: 0,
 				y: 310,
 				width: 350,
